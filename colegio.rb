@@ -51,6 +51,7 @@ class Nacional<Colegios
 		else 
 			@re=0
 		end
+		return @re
 	end
 
 	def puntaje_final()

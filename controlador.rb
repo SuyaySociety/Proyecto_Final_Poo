@@ -14,4 +14,16 @@ class Controlador
 		obj = Tutor.new(dni,apellido,nombre,parentesco)
 		return obj
 	end
+	def generarCodigo(n)
+		codigo = "A"
+		n = n + 1
+		if n < 10
+		  	codigo = codigo + "00" + n.to_s
+		  elsif n < 100
+			codigo = codigo + "0" + n.to_s
+			else
+			codigo = codigo + n.to_s		  		
+		end  
+		return codigo
+	end
 end

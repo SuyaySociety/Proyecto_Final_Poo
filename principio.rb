@@ -1,25 +1,37 @@
 require '../controlador/controlador.rb'
-$lista_colegios=Array.new()
-$lista_tutor=Array.new()
-$lista_evaluacion=Array.new()
+$lista_colegios = Array.new()
+$lista_tutor = Array.new()
+$lista_tutor_colegio = Array.new()
+$lista_evaluacion = Array.new()
 
 $ct = Controlador.new()
+
+def cabecera_tutor()
+	print "DNI".ljust(5)
+	print "APELLIDO".ljust(15)
+	print "NOMBRE".ljust(15)
+	print "PARENTESCO".ljust(15)
+	puts
+end
 
 def menu_principal()
 		begin
 		system('cls')
-		puts"--------------------------------Registrar Datos del participante--------------------------------"
+		puts"--------------------------------MENU DE REGISTRO DE DATOS--------------------------------"
 		puts"1. Registrar Colegio Nacional"
 		puts"2. Registrar Colegio Particular"
-		puts"3. Registrar Tutor del Estudiante"
-		puts"4. Realizar Evaluación"
-		puts"5. ***"
-		puts"6. ***"
-		puts"7. Salir"
+		puts"3. Registrar Tutor"
+		puts"4. Asignar Alumno a Tutor"
+		puts"5. Realizar Evaluación"
+		puts"6. Reporte Tutor y Alumno" 
+		puts"7. ***"
+		puts"8. ***"
+		puts"9. Salir"
 		puts
 		puts"Seleccione una opcion:"
 		opcion = gets.chomp.to_i
-	end until(opcion >=1 and opcion<=7)
+	end until(opcion >=1 and opcion<=9)
+
 	case opcion
 		when 1
 			registro_colegioNacional()
@@ -28,16 +40,16 @@ def menu_principal()
 		when 3
 			registro_Tutor()
 		when 4
-			realizarEvaluacion()
+			asignar_alumno_tutor()
 		when 5
-			pppp()
+			realizarEvaluacion()
 		when 6
-			ppp()
+			reporte_tutor_alumno()
 	end
 end
 def registro_colegioNacional()
 	system('cls')
-	puts"----------------------Registro de Colegio Nacional-----------------------------"
+	puts"----------------------REGISTRAR ALUMNO DE COLEGIO NACIONAL-----------------------------"
 	puts
 	puts "Ingrese DNI del estudiante: "
 	dni = gets.chomp.to_i
@@ -52,9 +64,9 @@ def registro_colegioNacional()
 	puts "Ingrese zona del estudiante, Rural o Urbano: "
 	zona = gets.chomp
 	puts "Ingrese promedio del 2do año del estudiante: "
-	genero = gets.chomp
+	promedio = gets.chomp
 
-	#codigo = $ct.generarCodigo($lista_disco.size)
+	#codigo = $ct.generarCodigo($lista_colegios.size)
 	obj = $ct.crearCnacional(dni,apellido,nombre,edad,genero,zona,promedio)
 	$lista_colegios.push(obj)
 	menu_principal()
@@ -62,7 +74,7 @@ end
 
 def registro_colegioParticular()
 	system('cls')
-	puts"----------------------Registro de Colegio Particular-----------------------------"
+	puts"----------------------REGISTRAR ALUMNO DE COLEGIO PARTICULAR-----------------------------"
 	puts
 	puts "Ingrese DNI del estudiante: "
 	dni = gets.chomp.to_i
@@ -79,14 +91,14 @@ def registro_colegioParticular()
 	puts "Ingrese puesto en que finalizo en el 2do grado, por ejemplo 2°puesto : "
 	puesto = gets.chomp
 
-	#codigo = $ct.generarCodigo($lista_disco.size)
+	#codigo = $ct.generarCodigo($lista_colegios.size)
 	obj = $ct.crearCparticular(dni,apellido,nombre,edad,genero,monto,puesto)
 	$lista_colegios.push(obj)
 	menu_principal()
 end
 def registro_Tutor()
 	system('cls')
-	puts"----------------------Registro del tutor del estudiante-----------------------------"
+	puts"-----------------------------REGISTRAR UN TUTOR-----------------------------"
 	puts
 	puts "Ingrese DNI del Tutor: "
 	dni = gets.chomp.to_i
@@ -101,39 +113,89 @@ def registro_Tutor()
 	$lista_tutor.push(obj)
 	menu_principal()
 end
+def asignar_alumno_tutor()
+	system('cls')
+	puts"----------------------ASIGNAR ALUMNO A UN TUTOR-----------------------------"
+	puts "Ingrese DNI del Alumno"
+	dni = gets.chomp.to_i
+	objAlum = nil
+	$lista_colegios.each do |item|
+		if item.dni == dni
+			objAlum = item
+			break
+		end
+	end
+	if (objAlum == nil)
+		puts "El Alumno no existe... presione una tecla para continuar"
+		gets
+		menu_principal()
+		else
+		puts 
+		puts "Alumno: #{objAlum.dni} - #{objAlum.apellido} - #{objAlum.nombre}"
+		puts
+		begin
+			puts "1. Asignar Tutor"
+			puts "2. Salir"
+			opcion = gets.chomp.to_i
+			if opcion == 1
+				if opcion == 1
+					$lista_tutor.each do |item|
+						if item.instance_of? Tutor
+							puts "#{item.dni} #{item.apellido} #{item.nombre}"
+						end
+					end					
+				end
+				puts "Seleccione un DNI para asigar. (pulse 0 para terminar de asignar)"
+				begin
+					dni = gets.chomp.to_i
+					objTutor = nil
+					$lista_tutor.each do |item|
+						if item.dni == dni
+							objTutor = item
+							break
+						end
+					end
+					if objTutor != nil
+						fila = [objAlum.dni,objTutor.dni]
+						$lista_tutor_colegio.push(fila)
+					end
+
+				end until dni == 0
+			end
+		end until opcion == 2
+		menu_principal()
+	end
+end
+
+def reporte_tutor_alumno()
+	system('cls')
+	puts"-----------------------------REPORTE DEL TUTOR Y EL ALUMNO-----------------------------"
+	puts
+	puts "Ingrese el DNI del Alumno"
+	dni = gets.chomp.to_i
+	puts
+	cabecera_tutor()
+	$lista_tutor_colegio.each do |item|
+		if dni == item[0]
+			$lista_tutor.each do |tutor|
+				if item[1] == tutor.dni
+					print "#{tutor.dni}".ljust(5)
+					print "#{tutor.apellido}".ljust(15)
+					print "#{tutor.nombre}".ljust(15)
+					print "#{tutor.parentesco}".ljust(15)
+					puts
+				end
+			end
+		end
+	end
+	puts
+	puts "Precione una tecla para continuar..."
+	gets
+	menu_principal()
+end
 
 menu_principal()
 
 
 
 
-
-
-
-=begin
-def lista()
-	puts "-------------------------------Lista de vehiculos----------------------------------------"
-	$lista_colegios.each do |item|
-		print "#{item.puntaje_final()}".ljust(10)
-		print "#{item.calificacionSocioconomica()}".ljust(10)
-		print "#{item.puntaje_rendimiento()}".ljust(10)
-		print "#{item.dni}".ljust(10)
-		print "#{item.nombre}".ljust(10)
-		print "#{item.apellido}".ljust(12)
-		print "#{item.edad}".ljust(12)
-		print "#{item.genero}".ljust(12)
-		puts""
-	end
-	#dni,apellido,nombre,edad,genero,zona,promedio
-	#dni,apellido,nombre,edad,genero,monto,puesto
-end
-obj = $ct.crearCnacional("123","Blano","Audi",15,"Femenino","Rural",18)
-$lista_colegios.push(obj)
-obj = $ct.crearCparticular("124","Dueñas","KIA",14,"Masculino",400,"5°puesto")
-$lista_colegios.push(obj)
-obj = $ct.crearCnacional("125","Honda","Suzuki",13,"Femenino","Urbano",14)
-$lista_colegios.push(obj)
-
-
-lista()
-=end
